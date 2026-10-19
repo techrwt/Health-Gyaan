@@ -1,6 +1,22 @@
 {
   "updated": "2026-10-19",
   "siteUrl": "https://techrwt.github.io/Health-Gyaan",
-  "count": 0,
-  "articles": []
+  "count": 1,
+  "articles": [
+    {
+      "slug": "shakahari-protein-ke-sources",
+      "category": "diet",
+      "date": "2026-10-19",
+      "image": "assets/images/articles/shakahari-protein-ke-sources.webp",
+      "thumbnail": "assets/images/articles/thumbs/shakahari-protein-ke-sources.webp",
+      "hi": {
+        "title": "शाकाहारी प्रोटीन के स्रोत: दाल-रोटी से रोज़ का प्रोटीन कैसे पूरा करें?",
+        "description": "शाकाहारी प्रोटीन के स्रोत कौन-से हैं, रोज़ कितना चाहिए, और दाल, दही, पनीर व सोया से कटोरी के हिसाब से इसे कैसे पूरा करें, ICMR-NIN के आधार पर जानिए।"
+      },
+      "en": {
+        "title": "Vegetarian Protein Sources: How to Meet Daily Protein with Everyday Indian Food",
+        "description": "Vegetarian protein sources for Indian kitchens: how much you need daily, protein per katori of dal, curd and paneer, a sample day plan, and when to see a doctor."
+      }
+    }
+  ]
 }
