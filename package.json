@@ -1,0 +1,15 @@
+{
+  "name": "rawat-health-gyan",
+  "version": "1.0.0",
+  "private": true,
+  "description": "Rawat Health ज्ञान - Hindi/English static health information website with GitHub Actions automation",
+  "scripts": {
+    "build": "node scripts/build.js",
+    "rebuild": "node scripts/build.js --rebuild",
+    "check-colors": "node scripts/check-colors.js"
+  },
+  "engines": { "node": ">=18" },
+  "dependencies": {
+    "sharp": "^0.33.5"
+  }
+}

@@ -1,0 +1,99 @@
+<!DOCTYPE html>
+<html lang="hi" translate="no" class="notranslate" data-root="../"
+  data-title-hi="संपर्क करें | Rawat Health ज्ञान"
+  data-title-en="Contact Us | Rawat Health Gyaan">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="google" content="notranslate">
+  <meta name="theme-color" content="#0B5D4B">
+  <title>संपर्क करें | Rawat Health ज्ञान</title>
+  <meta name="description" content="Rawat Health ज्ञान से संपर्क करें: सुझाव, गलती सुधार या सहयोग के लिए हमें email करें।">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Mukta:wght@400;600;700;800&family=Noto+Sans+Devanagari:wght@400;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="../assets/css/style.css">
+  <script>try{var l=localStorage.getItem('rhg_lang');if(l==='en'){document.documentElement.lang='en';}}catch(e){}</script>
+</head>
+<body class="notranslate">
+  <div id="site-header"></div>
+
+  <main class="container page">
+    <div class="page-card">
+
+      <div data-lang="hi">
+        <h1>संपर्क करें</h1>
+        <p class="updated">हम आपके सुझाव और सुधार के संदेशों का स्वागत करते हैं।</p>
+
+        <h2>हमें किस लिए लिखें</h2>
+        <ul>
+          <li>लेख में कोई गलती या पुरानी जानकारी बताने के लिए</li>
+          <li>नए विषय का सुझाव देने के लिए</li>
+          <li>कॉपीराइट या सामग्री से जुड़ी शिकायत के लिए</li>
+          <li>सहयोग या अन्य सामान्य पूछताछ के लिए</li>
+        </ul>
+
+        <h2>Email</h2>
+        <p>हमें इस पते पर लिखें: <a href="mailto:" data-site-email>your-email@example.com</a></p>
+        <p>हम आम तौर पर कुछ कार्य-दिवसों में जवाब देने की कोशिश करते हैं।</p>
+
+        <div class="emergency">
+          <strong>ज़रूरी सूचना:</strong> हम व्यक्तिगत चिकित्सा सलाह नहीं दे सकते। किसी आपातकाल (जैसे सीने में तेज़ दर्द, साँस लेने में गंभीर तकलीफ़, बेहोशी या भारी रक्तस्राव) में तुरंत 112 पर कॉल करें या नज़दीकी अस्पताल जाएँ।
+        </div>
+      </div>
+
+      <div data-lang="en">
+        <h1>Contact Us</h1>
+        <p class="updated">We welcome your suggestions and correction notes.</p>
+
+        <h2>Why you might write to us</h2>
+        <ul>
+          <li>To report a mistake or outdated information in an article</li>
+          <li>To suggest a new topic</li>
+          <li>For copyright or content-related complaints</li>
+          <li>For collaboration or other general enquiries</li>
+        </ul>
+
+        <h2>Email</h2>
+        <p>Write to us at: <a href="mailto:" data-site-email>your-email@example.com</a></p>
+        <p>We usually try to reply within a few working days.</p>
+
+        <div class="emergency">
+          <strong>Important:</strong> We cannot give personal medical advice. In an emergency (such as severe chest pain, serious difficulty breathing, fainting or heavy bleeding), call 112 immediately or go to the nearest hospital.
+        </div>
+      </div>
+
+      <form id="contact-form" class="form-grid" novalidate>
+        <div data-lang="hi" class="form-grid">
+          <label>आपका नाम <input type="text" id="cf-name-hi" autocomplete="name"></label>
+          <label>संदेश <textarea id="cf-msg-hi"></textarea></label>
+          <button type="submit" class="send-btn">Email ऐप में खोलें</button>
+        </div>
+        <div data-lang="en" class="form-grid">
+          <label>Your name <input type="text" id="cf-name-en" autocomplete="name"></label>
+          <label>Message <textarea id="cf-msg-en"></textarea></label>
+          <button type="submit" class="send-btn">Open in email app</button>
+        </div>
+      </form>
+
+    </div>
+  </main>
+
+  <div id="site-footer"></div>
+  <script src="../assets/js/app.js" defer></script>
+  <script>
+    // यह वेबसाइट static है, इसलिए form आपके email ऐप में संदेश तैयार कर देता है (कोई data हमारे पास नहीं आता)।
+    document.getElementById('contact-form').addEventListener('submit', function (e) {
+      e.preventDefault();
+      RHG.ready.then(function () {
+        var lang = RHG.lang();
+        var name = document.getElementById('cf-name-' + lang).value.trim();
+        var msg = document.getElementById('cf-msg-' + lang).value.trim();
+        var email = RHG.site().contactEmail || '';
+        var body = (name ? name + '\n\n' : '') + msg;
+        location.href = 'mailto:' + email + '?subject=' + encodeURIComponent(RHG.t('contact.subject')) + '&body=' + encodeURIComponent(body);
+      });
+    });
+  </script>
+</body>
+</html>

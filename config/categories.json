@@ -1,0 +1,35 @@
+{
+  "_help": "नई category जोड़ने के लिए नीचे की list में एक नया block जोड़ें। id सिर्फ छोटे अंग्रेज़ी अक्षरों/अंकों/hyphen में रखें। यही id batch JSON के 'category' में लिखनी है। color कोई भी गहरा रंग (hex) हो सकता है, पर काला/सफ़ेद/ग्रे नहीं।",
+  "categories": [
+    {
+      "id": "home-remedies",
+      "hi": "घरेलू नुस्खे",
+      "en": "Home Remedies",
+      "color": "#E07A1F"
+    },
+    {
+      "id": "ayurveda",
+      "hi": "आयुर्वेद",
+      "en": "Ayurveda",
+      "color": "#2E9E5B"
+    },
+    {
+      "id": "diseases",
+      "hi": "बीमारियाँ व लक्षण",
+      "en": "Diseases & Symptoms",
+      "color": "#D9455F"
+    },
+    {
+      "id": "diet",
+      "hi": "डाइट व पोषण",
+      "en": "Diet & Nutrition",
+      "color": "#6F9A1E"
+    },
+    {
+      "id": "yoga",
+      "hi": "योग व फिटनेस",
+      "en": "Yoga & Fitness",
+      "color": "#7B4FB3"
+    }
+  ]
+}

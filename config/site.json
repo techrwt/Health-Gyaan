@@ -1,0 +1,8 @@
+{
+  "name": "Rawat Health ज्ञान",
+  "nameEn": "Rawat Health Gyaan",
+  "siteUrl": "",
+  "contactEmail": "your-email@example.com",
+  "pageSize": 9,
+  "_help": "siteUrl खाली छोड़ने पर GitHub Actions खुद 'https://<username>.github.io/<repo>' बना लेगा। अपना custom domain हो तो यहाँ पूरा URL लिखें (अंत में / के बिना), जैसे https://www.example.com। contactEmail अपना असली email डालें; यह Contact पेज पर दिखेगा।"
+}
