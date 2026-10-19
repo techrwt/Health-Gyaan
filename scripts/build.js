@@ -29,10 +29,11 @@ const P = {
   articles: path.join(ROOT, 'articles'),
   index: path.join(ROOT, 'index.json'),
   categories: path.join(ROOT, 'config', 'categories.json'),
-  site: path.join(ROOT, 'config', 'site.json')
+  site: path.join(ROOT, 'config', 'site.json'),
+  home: path.join(ROOT, 'index.html')
 };
 
-const { renderArticle } = require('./article-template');
+const { renderArticle, esc } = require('./article-template');
 
 let sharp;
 try {
@@ -254,17 +255,66 @@ async function rebuildAll(state) {
 
 /* ---------- sitemap / robots ---------- */
 function writeSitemap(state) {
-  const today = new Date().toISOString().slice(0, 10);
+  // lastmod सिर्फ तब, जब वह सच हो: Google नकली/रोज़ बदलती तारीख़ें नज़रअंदाज़ कर देता है
+  const latest = state.articles.length ? state.articles[0].date : null;
   const urls = STATIC_PAGES.map(function (p) {
-    const loc = p === 'index.html' ? state.siteUrl + '/' : state.siteUrl + '/' + p;
-    return '  <url><loc>' + loc + '</loc><lastmod>' + today + '</lastmod><changefreq>' + (p === 'index.html' ? 'daily' : 'yearly') + '</changefreq><priority>' + (p === 'index.html' ? '1.0' : '0.5') + '</priority></url>';
+    const isHome = p === 'index.html';
+    const loc = isHome ? state.siteUrl + '/' : state.siteUrl + '/' + p;
+    return '  <url><loc>' + loc + '</loc>' + (isHome && latest ? '<lastmod>' + latest + '</lastmod>' : '') + '</url>';
   });
   state.articles.forEach(function (a) {
-    urls.push('  <url><loc>' + state.siteUrl + '/articles/' + a.slug + '.html</loc><lastmod>' + a.date + '</lastmod><changefreq>monthly</changefreq><priority>0.8</priority></url>');
+    urls.push('  <url><loc>' + state.siteUrl + '/articles/' + a.slug + '.html</loc><lastmod>' + a.date + '</lastmod></url>');
   });
   fs.writeFileSync(path.join(ROOT, 'sitemap.xml'),
     '<?xml version="1.0" encoding="UTF-8"?>\n<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">\n' + urls.join('\n') + '\n</urlset>\n');
   fs.writeFileSync(path.join(ROOT, 'robots.txt'), 'User-agent: *\nAllow: /\n\nSitemap: ' + state.siteUrl + '/sitemap.xml\n');
+}
+
+/* ---------- Home page का SEO हिस्सा (canonical, OG, schema, लेखों के links) ---------- */
+function replaceBetween(html, start, end, content) {
+  const a = html.indexOf(start), b = html.indexOf(end);
+  if (a === -1 || b === -1 || b < a) return null;
+  return html.slice(0, a + start.length) + '\n' + content + '\n' + html.slice(b);
+}
+
+function updateHomeSeo(state) {
+  if (!fs.existsSync(P.home)) return;
+  const html = fs.readFileSync(P.home, 'utf8');
+  const home = state.siteUrl + '/';
+  const logo = state.siteUrl + '/assets/images/Logo.png';
+  const title = 'Rawat Health ज्ञान - सेहत की जानकारी आसान हिंदी में';
+  const desc = 'घरेलू नुस्खे, आयुर्वेद, डाइट और योग की शैक्षिक जानकारी हिंदी और English में।';
+  const schema = {
+    '@context': 'https://schema.org',
+    '@graph': [
+      { '@type': 'WebSite', '@id': home + '#website', name: state.siteName, url: home, inLanguage: ['hi', 'en'], publisher: { '@id': home + '#org' } },
+      { '@type': 'Organization', '@id': home + '#org', name: state.siteName, url: home, logo: { '@type': 'ImageObject', url: logo } }
+    ]
+  };
+  const head = [
+    '  <meta name="robots" content="index, follow, max-image-preview:large">',
+    '  <link rel="canonical" href="' + esc(home) + '">',
+    '  <link rel="icon" type="image/png" href="assets/images/Logo.png">',
+    '  <meta property="og:url" content="' + esc(home) + '">',
+    '  <meta property="og:image" content="' + esc(logo) + '">',
+    '  <meta name="twitter:card" content="summary_large_image">',
+    '  <meta name="twitter:title" content="' + esc(title) + '">',
+    '  <meta name="twitter:description" content="' + esc(desc) + '">',
+    '  <meta name="twitter:image" content="' + esc(logo) + '">',
+    '  <script type="application/ld+json">' + JSON.stringify(schema).replace(/</g, '\\u003c') + '</script>'
+  ].join('\n');
+
+  let out = replaceBetween(html, '<!--SEO-START-->', '<!--SEO-END-->', head);
+  if (out === null) { console.warn('⚠️  index.html में <!--SEO-START--> / <!--SEO-END--> markers नहीं मिले, home SEO अपडेट नहीं हुआ।'); return; }
+
+  const list = state.articles.slice(0, 60).map(function (a) {
+    return '      <li><a href="articles/' + a.slug + '.html">' + esc(a.hi.title) + '</a></li>';
+  }).join('\n');
+  const withLinks = replaceBetween(out, '<!--LINKS-START-->', '<!--LINKS-END-->', '    <noscript>\n    <ul>\n' + list + '\n    </ul>\n    </noscript>');
+  if (withLinks !== null) out = withLinks;
+  else console.warn('⚠️  index.html में <!--LINKS-START--> / <!--LINKS-END--> markers नहीं मिले, लेखों के links नहीं जुड़े।');
+
+  if (out !== html) fs.writeFileSync(P.home, out);
 }
 
 /* ---------- main ---------- */
@@ -316,6 +366,7 @@ function writeSitemap(state) {
 
   fs.writeFileSync(P.index, JSON.stringify({ updated: new Date().toISOString().slice(0, 10), siteUrl: state.siteUrl, count: state.articles.length, articles: state.articles }, null, 2) + '\n');
   writeSitemap(state);
+  updateHomeSeo(state);
 
   console.log('\n— सारांश: ' + stats.ok + ' सफल, ' + stats.failed + ' गलत (batches/failed/ में), ' + stats.waiting + ' image का इंतज़ार में। कुल लेख: ' + state.articles.length);
   console.log('— Site URL: ' + state.siteUrl);
