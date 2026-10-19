@@ -1,0 +1,63 @@
+name: Batch process और publish
+
+# जब भी आप batches/ में नई JSON या images-incoming/ में image push करेंगे,
+# यह workflow अपने आप: image -> WebP, article HTML, index.json, sitemap.xml, robots.txt बनाकर
+# बदलाव वापस commit कर देगा (GitHub Pages उसे खुद publish कर देगा)।
+
+on:
+  push:
+    branches: [main, master]
+    paths:
+      - 'batches/*.json'
+      - 'images-incoming/**'
+      - 'config/**'
+      - 'scripts/**'
+  workflow_dispatch:
+    inputs:
+      rebuild:
+        description: 'सभी articles के HTML दोबारा बनाएँ (template बदलने पर)'
+        type: boolean
+        default: false
+
+permissions:
+  contents: write
+
+concurrency:
+  group: build-site
+  cancel-in-progress: false
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Code लाना
+        uses: actions/checkout@v4
+
+      - name: Node.js तैयार करना
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+
+      - name: Packages install (sharp)
+        run: npm install --no-audit --no-fund
+
+      - name: Batches process करना
+        run: |
+          if [ "${{ github.event.inputs.rebuild }}" = "true" ]; then
+            node scripts/build.js --rebuild
+          else
+            node scripts/build.js
+          fi
+
+      - name: बदलाव commit और push करना
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add -A
+          if git diff --cached --quiet; then
+            echo "कोई बदलाव नहीं, commit की ज़रूरत नहीं।"
+          else
+            git commit -m "Auto: batches process हुए [skip ci]"
+            git pull --rebase --autostash origin "${GITHUB_REF_NAME}" || true
+            git push origin "HEAD:${GITHUB_REF_NAME}"
+          fi
